@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Video Recommendation Demo">
+    <meta name="description" content="">
+    <meta name="page_type" content="np-template-header-footer-from-plugin">
+    <title>Home</title>
+    <link rel="stylesheet" href="nicepage.css" media="screen">
+
+  </head>
+  <body data-home-page="Home.html" data-home-page-title="Home" class="u-body"><header class="u-clearfix u-header u-header" id="sec-a257"><div class="u-clearfix u-sheet u-sheet-1">
+        <h2 class="u-align-center u-text u-text-default u-text-1">Job Recommendation Demo</h2>
+      </div></header>
+    <section class="u-clearfix u-section-1" id="sec-ee95">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <div class="u-clearfix u-expanded-width u-layout-wrap u-layout-wrap-1">
+          <div class="u-layout">
+            <div class="u-layout-row">
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-1">
+                <div class="u-container-layout u-container-layout-1">
+                  <h3 class="u-text u-text-default u-text-1">Upload Employee data</h3>
+                  <div class="u-expanded-width u-form u-form-1">
+                    <form action="#" method="POST" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" source="custom" name="form" style="padding: 10px;">
+                      <div class="u-form-group u-form-message">
+                        <label for="message-fc9f" class="u-form-control-hidden u-label"></label>
+                        <input type="file" id="myFile" multiple size="50">
+                      </div>
+                      <div class="u-align-left u-form-group u-form-submit">
+                        
+                        <input type="submit" value="submit" class="u-form-control-hidden" id="fetchUserDataBtn">
+                      </div>                      
+                      <input type="hidden" value="" name="recaptchaResponse">
+                      <pre id="output"></pre>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-2">
+                <div class="u-container-layout u-valign-top u-container-layout-2">
+                  <h3 class="u-text u-text-default u-text-2">Recommended Roles</h3>
+                  <div id="response"><p class="u-align-left u-text u-text-default u-text-3">Please upload data to get results.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <script type="text/javascript">
+    
+      function displayResult(response){
+        var mainContainer = document.getElementById("response");
+        mainContainer.innerHTML = "";
+        var jsonData = JSON.parse(response);
+        for (var i = 0; i < jsonData.pre_data.length; i++) {
+          var roles = jsonData.pre_data[i];
+          var div = document.createElement("li");
+          div.innerHTML = roles;
+          mainContainer.appendChild(div);
+          console.log(roles);
+          }
+      }
+    
+    </script>
+
+    <script type="text/javascript">
+    
+      function callMLapi(fileData){
+            console.log("ML API called ");
+            localhst = "http://127.0.0.1:5000/"
+            param = '?file='.concat(fileData)
+            url = localhst.concat(param)
+            console.log(url);
+            displayResult('{"act_data": ["r_ar_role", "t_ir_role", "w_fr_role"], "pre_data": ["r_ar_role","test_role","test_role2"]}')
+            fetch(url)
+              .then((response) => response.json())
+              .then((messages) => {console.log("messages");})
+              .then((responseJson) => {
+                this.displayResult(responseJson);
+              })            
+        }
+    </script>
+
+    <script type="text/javascript">
+      document.getElementById('myFile')
+          .addEventListener('change', function() {
+            
+          var fr=new FileReader();
+          fr.onload=function(){
+              console.log(fr['result'])
+              callMLapi(fr['result'])
+          }            
+          fr.readAsText(this.files[0]);
+      })
+    </script> 
+
+    
+  </body>
+</html>
