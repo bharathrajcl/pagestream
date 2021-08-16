@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Video Recommendation Demo">
+    <meta name="description" content="">
+    <meta name="page_type" content="np-template-header-footer-from-plugin">
+    <title>Home</title>
+    <link rel="stylesheet" href="nicepage.css" media="screen">
+
+  </head>
+
+  <style>
+    #videoplayer {
+       display: none;
+       z-index: 999;
+       margin-top: 10px;
+       margin-left: 10px;
+    }
+ </style>
+
+  <body data-home-page="Home.html" data-home-page-title="Home" class="u-body"><header class="u-clearfix u-header u-header" id="sec-a257"><div class="u-clearfix u-sheet u-sheet-1">
+        <h2 class="u-align-center u-text u-text-default u-text-1">Video Recommendation Demo</h2>
+      </div></header>
+    <section class="u-clearfix u-section-1" id="sec-ee95">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <div class="u-clearfix u-expanded-width u-layout-wrap u-layout-wrap-1">
+          <div class="u-layout">
+            <div class="u-layout-row">
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-1">
+                <div class="u-container-layout u-container-layout-1">
+                  <h3 class="u-text u-text-default u-text-1">Enter minutes of meeting data</h3>
+                  <div class="u-expanded-width u-form u-form-1">
+                    <form action="#" method="POST" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" source="custom" name="form" style="padding: 10px;">
+                      <div class="u-form-group u-form-message">
+                        <label for="message-fc9f" class="u-form-control-hidden u-label"></label>
+                        <textarea id="myFile" name="message" rows="10" cols="50"></textarea>
+                      </div>
+                      <div class="u-align-left u-form-group u-form-submit">
+                        
+                        <input type="submit" value="submit" class="u-form-control-hidden" id="fetchUserDataBtn">
+                      </div>                      
+                      <input type="hidden" value="" name="recaptchaResponse">
+                      <pre id="output"></pre>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="u-container-style u-layout-cell u-size-30 u-layout-cell-2">
+                <div class="u-container-layout u-valign-top u-container-layout-2">
+                  <h3 class="u-text u-text-default u-text-2">Recommended Videos</h3>
+                  <div id="response"><p class="u-align-left u-text u-text-default u-text-3">Please enter data to get results.</p>
+                </div><br><br>
+                <video id="videoplayer" src="" type='video/mp4' controls autoplay>
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>    
+
+    <script type="text/javascript">    
+    function displayVideo(name){
+        var path = "videos/" + name.trim() + ".mp4";
+        console.log(path)
+        document.getElementById("videoplayer").src = path;
+        document.getElementById("videoplayer").style.display = "block";
+    }
+
+    </script>
+
+
+    <script type="text/javascript">
+    
+      function displayResult(jsonData){
+        console.log("displayResult called ");
+        var mainContainer = document.getElementById("response");
+        /*console.log(response);*/
+        mainContainer.innerHTML = "";
+        for (var i = 0; i < jsonData.pre_data.length; i++) {
+          var name = jsonData.pre_data[i][0];
+          var score = jsonData.pre_data[i][1];
+          var listDiv = document.createElement("li");
+          mainContainer.appendChild(listDiv);
+          var anchorDiv = document.createElement("a");
+          anchorDiv.innerHTML = name;
+          anchorDiv.setAttribute('href',"#");
+          anchorDiv.setAttribute('onclick','displayVideo( " '+name+' " )')
+          listDiv.appendChild(anchorDiv);
+          var cfDiv = document.createElement("p");
+          cfDiv.innerHTML = ' , (' + score + ')%';
+          listDiv.appendChild(cfDiv)
+          /*console.log(name);*/
+          }
+      }
+    </script>
+
+    <script type="text/javascript">
+    
+      async function callMLapi(fileData){
+            console.log("callMLapi called ");
+            localhst = "http://127.0.0.1:5000/"
+            param = '?text='.concat(fileData)
+            url = localhst.concat(param)
+            console.log(url);
+            const resp = await fetch(url);
+            const data = await resp.json();
+            /*console.log(typeof data)*/
+            displayResult(data)            
+        }
+    </script>
+
+    <script type="text/javascript">
+      document.getElementById('myFile')
+          .addEventListener('change', function() {
+            var encodedparam = encodeURI(this.value)
+            callMLapi(encodedparam)
+          })
+    </script> 
+
+    
+  </body>
+</html>
